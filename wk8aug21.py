@@ -1,4 +1,4 @@
-from typing import List
+from typing import DefaultDict, List
 
 class Solution:
     # https://leetcode-cn.com/problems/super-ugly-number/
@@ -44,6 +44,20 @@ class Solution:
                 cur = 2
 
         return int(cnt)
+
+    # https://leetcode-cn.com/problems/arithmetic-slices-ii-subsequence/
+    def numberOfArithmeticSlices(self, nums: List[int]) -> int:
+        total = 0
+        dp = [DefaultDict(int) for _ in nums]
+        for i, x in enumerate(nums):
+            for j in range(i):
+                delta = x - nums[j]
+                precnt = dp[j][delta]
+                newcnt = precnt + 1 # adding a new len=2 slice
+                total = total + precnt # len >= 3
+                dp[i][delta] = dp[i][delta] + newcnt
+
+        return total
 
 def main():
     s = Solution()
