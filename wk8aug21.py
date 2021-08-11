@@ -59,9 +59,31 @@ class Solution:
 
         return total
 
+    # https://leetcode-cn.com/problems/longest-palindromic-subsequence/
+    def longestPalindromeSubseq(self, s: str) -> int:
+        l = len(s)
+        memo = [[0] * l for _ in range(l)]
+        return self.lps516Rec(s, 0, l-1, memo)
+
+    def lps516Rec(self, s: str, l: int, r: int, memo: List[List[int]]) -> int:
+        if l > r: return 0
+        elif l == r: return 1
+        elif r - l == 1:
+            if s[l] == s[r]: return 2
+            else: return 1
+        elif memo[l][r] != 0: return memo[l][r]
+        else:
+            mLen = 0
+            if s[l] == s[r]:
+                mLen = self.lps516Rec(s, l+1, r-1, memo) + 2
+
+            mLen = max(mLen, self.lps516Rec(s, l+1, r, memo), self.lps516Rec(s, l, r-1, memo))
+            memo[l][r] = mLen
+            return mLen
+
 def main():
     s = Solution()
-    print(s.numberOfArithmeticSlices([1,2,3,4,1,2,3]))
+    print(s.longestPalindromeSubseq("abcdef"))
 
 if __name__ == "__main__":
     main()
