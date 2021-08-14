@@ -92,9 +92,31 @@ class Solution:
             mulk *= 10
         return ans
 
+    # https://leetcode-cn.com/problems/out-of-boundary-paths/
+    def findPaths(self, m: int, n: int, maxMove: int, startRow: int, startColumn: int) -> int:
+        # 三维DP
+        md = 10**9 + 7
+        dp = [[[0] * (maxMove + 1) for _ in range(n)] for _ in range(m)]
+        ds = [[0,1],[1,0],[0,-1],[-1,0]]
+        dp[startRow][startColumn][0] = 1
+        result = 0
+        for move in range(0, maxMove):
+            for i in range(m):
+                for j in range(n):
+                    for d in ds:
+                        ni, nj = i + d[0], j + d[1]
+                        if ni >= 0 and ni < m and nj >= 0 and nj < n:
+                            if dp[i][j][move] > 0:
+                                dp[ni][nj][move+1] = (dp[i][j][move] + dp[ni][nj][move+1]) % md
+                        else:
+                            result = (result + dp[i][j][move]) % md
+
+        return result
+
+
 def main():
     s = Solution()
-    print(s.longestPalindromeSubseq("abcdef"))
+    print(s.findPaths(1, 3, 3, 0, 1))
 
 if __name__ == "__main__":
     main()
