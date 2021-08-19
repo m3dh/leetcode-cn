@@ -113,10 +113,53 @@ class Solution:
 
         return result
 
+    # https://leetcode-cn.com/problems/student-attendance-record-i/
+    def checkRecord(self, s: str) -> bool:
+        late = 0
+        abse = 0
+        for ch in s:
+            if ch == 'A':
+                abse = abse + 1
+                late = 0
+                if abse >= 2:
+                    return False
+            elif ch == 'L':
+                late = late + 1
+                if late >= 3:
+                    return False
+            else:
+                late = 0
+        return True
 
+    # https://leetcode-cn.com/problems/reverse-string-ii/
+    def reverseStr(self, s: str, k: int) -> str:
+        l = list(s)
+        idx = 0
+        slen = len(l)
+        while idx < slen - 1:
+            nidx = idx
+            # forward nidx k-1 times.
+            for _ in range(k-1):
+                nidx = nidx + 1
+                if nidx == slen - 1:
+                    break
+
+            # reverse
+            for d in range(k):
+                if idx + d >= nidx - d:
+                    break
+                else:
+                    l[idx+d], l[nidx-d] = l[nidx-d], l[idx+d]
+
+            idx = nidx
+                
+            for _ in range(k+1):
+                idx = idx + 1
+        return "".join(l)
+        
 def main():
     s = Solution()
-    print(s.findPaths(1, 3, 3, 0, 1))
+    print(s.reverseStr("abcdefg", 2))
 
 if __name__ == "__main__":
     main()
