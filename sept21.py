@@ -1,3 +1,6 @@
+import heapq
+from typing import DefaultDict, List
+
 class Solution:
     class ListNode:
         def __init__(self, x):
@@ -31,3 +34,38 @@ class Solution:
             sub = sub.next
         
         return sub
+    
+    def smallestK(self, arr: List[int], k: int) -> List[int]:
+        maxHeap = []
+        if k > 0:
+            for n in arr:
+                if len(maxHeap) < k:
+                    heapq.heappush(maxHeap, -n)
+                elif -n > maxHeap[0]:
+                    heapq.heappushpop(maxHeap, -n)
+
+        ret = [-n for n in maxHeap]
+        return ret
+
+    # https://leetcode-cn.com/problems/implement-rand10-using-rand7/
+    def rand10(self):
+        fp = 999
+        while fp > 6:
+            fp = rand7()
+        
+        fx = 999
+        while fx > 5:
+            fx = rand7()
+        
+        return fx if fp % 2 == 0 else fx + 5
+
+    def rand7(self):
+        return 1
+
+
+def main():
+    s = Solution()
+    print(s.smallestK([1,3,5,7,2,4,6,8], 4))
+
+if __name__ == "__main__":
+    main()
