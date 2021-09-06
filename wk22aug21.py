@@ -1,5 +1,4 @@
 from typing import DefaultDict, List
-import heapq
 
 class Solution:
     # https://leetcode-cn.com/problems/boats-to-save-people/
