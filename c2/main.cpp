@@ -10,12 +10,13 @@
 DEFINE_int32(lccn_code, 0, "A useless input code");
 
 void runSolution() {
-  std::vector<int> profs{1, 2, 3};
-  std::vector<int> capts{0, 1, 1};
-
+  std::vector<std::string> words{
+      "This", "is", "an", "example", "of", "text", "justification."};
   sept21::Solution s{};
-  auto result = s.findMaximizedCapital(2, 0, profs, capts);
-  std::cout << "Result: " << folly::toPrettyJson(result) << std::endl;
+  auto result = s.fullJustify(words, 16);
+  for (auto line : result) {
+    std::cout << "[L]: " << line << std::endl;
+  }
 }
 
 int main(int argc, char **argv) {

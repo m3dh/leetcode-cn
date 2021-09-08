@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <queue>
+#include <sstream>
 #include <string>
 
 #include "alc.h"
@@ -115,6 +116,74 @@ class Solution {
     }
 
     return w;
+  }
+
+  // https://leetcode-cn.com/problems/text-justification/
+  vector<string> fullJustify(vector<string>& words, int maxWidth) {
+    const auto filler = ' ';
+    vector<string> result{};
+    int l = 0;
+    int r = 0;
+    int len = 0;
+    while (l < words.size()) {
+      len = 0;
+      while (r < words.size() && len + words[r].length() <= maxWidth) {
+        if (len + words[r].length() < maxWidth) {
+          len = words[r].length() + 1 + len;  // +1 space
+        } else {
+          len = words[r].length() + len;
+        }
+        ++r;
+      }
+
+      std::stringstream line{};
+      if (r == words.size()) {
+        // last line.
+        auto fullLen = 0;
+        while (l < r) {
+          line << words[l];
+          fullLen += words[l].length();
+          if (l != r - 1) {
+            line << filler;
+            fullLen++;
+          }
+          ++l;
+        }
+
+        while (fullLen < maxWidth) {
+          line << filler;
+          fullLen++;
+        }
+      } else {
+        auto fullLen = 0;
+        auto spCount = r - l - 1;
+        for (auto i = l; i < r; ++i) {
+          fullLen += words[i].length();
+        }
+
+        auto gap = maxWidth - fullLen;
+        auto sps = spCount == 0 ? gap : gap / spCount;
+        auto flo = spCount == 0 ? 0 : gap % spCount;
+        for (auto i = l; i < r; ++i) {
+          line << words[i];
+          if (i != r - 1 || i == l) {
+            for (auto j = 0; j < sps; ++j) {
+              line << filler;
+            }
+
+            if (flo > 0) {
+              line << filler;
+              --flo;
+            }
+          }
+        }
+      }
+
+      result.push_back(move(line.str()));
+      l = r;
+    }
+
+    return result;
   }
 };
 
