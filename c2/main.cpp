@@ -10,13 +10,9 @@
 DEFINE_int32(lccn_code, 0, "A useless input code");
 
 void runSolution() {
-  std::vector<std::string> words{
-      "This", "is", "an", "example", "of", "text", "justification."};
   sept21::Solution s{};
-  auto result = s.fullJustify(words, 16);
-  for (auto line : result) {
-    std::cout << "[L]: " << line << std::endl;
-  }
+  auto result = s.checkValidString("((*)");
+  std::cout << result << std::endl;
 }
 
 int main(int argc, char **argv) {

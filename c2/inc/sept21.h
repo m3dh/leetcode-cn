@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <numeric>
 #include <queue>
 #include <sstream>
 #include <string>
@@ -184,6 +185,50 @@ class Solution {
     }
 
     return result;
+  }
+
+  // https://leetcode-cn.com/problems/find-the-student-that-will-replace-the-chalk/
+  int chalkReplacer(vector<int>& chalk, int k) {
+    auto roundUsage = accumulate(chalk.begin(), chalk.end(), 0LL);
+    k = k % roundUsage;
+    for (int i = 0; i < chalk.size(); ++i) {
+      if (k < chalk[i]) {
+        return i;
+      } else {
+        k -= chalk[i];
+      }
+    }
+
+    return -1;
+  }
+
+  // https://leetcode-cn.com/problems/valid-parenthesis-string/
+  bool checkValidString(string s) {
+    int minLeft = 0;
+    int maxLeft = 0;
+    for (auto ch : s) {
+      if (ch == '(') {
+        ++minLeft;
+        ++maxLeft;
+      } else if (ch == '*') {
+        if (minLeft > 0) {
+          --minLeft;
+        }
+
+        ++maxLeft;
+      } else {  // ch == ')'
+        if (maxLeft <= 0) {
+          return false;
+        }
+
+        if (minLeft > 0) {
+          --minLeft;
+        }
+        --maxLeft;
+      }
+    }
+
+    return minLeft == 0;
   }
 };
 
