@@ -8,5 +8,6 @@
         "vector": "cpp",
         "string": "cpp",
         "set": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": true
 }
