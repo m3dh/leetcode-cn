@@ -1,4 +1,5 @@
 from typing import DefaultDict, List
+import sys
 
 
 class Solution:
@@ -36,6 +37,24 @@ class Solution:
                 else:
                     return False
         return remain == 0
+
+    # https://leetcode-cn.com/problems/minimum-index-sum-of-two-lists/
+    def findRestaurant(self, list1: List[str], list2: List[str]) -> List[str]:
+        map1 = DefaultDict(lambda: -1)
+        ret = []
+        cur_min = sys.maxsize
+        for i1, v in enumerate(list1):
+            map1[v] = i1
+        for i2, v in enumerate(list2):
+            i1 = map1[v]
+            if i1 >= 0:
+                if i1 + i2 < cur_min:
+                    ret.clear()
+                    ret.append(v)
+                    cur_min = i1 + i2
+                elif i1 + i2 == cur_min:
+                    ret.append(v)
+        return ret
 
 
 if __name__ == "__main__":
