@@ -1,51 +1,32 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "folly/json.h"
+#include "folly/experimental/coro/Task.h"
+#include "folly/experimental/coro/BlockingWait.h"
 #include "gflags/gflags.h"
 #include "glog/logging.h"
 #include "inc/sept21.h"
 
 DEFINE_int32(lccn_code, 0, "A useless input code");
 
-namespace
-{
-  using namespace std;
-  class Solution
-  {
+class Test {
   public:
-    Solution(vector<int> &nums) : nums{nums} {}
-
-    vector<int> reset() { return nums; }
-
-    vector<int> shuffle()
-    {
-      vector<int> ret{};
-      vector<int> q{nums};
-      ret.reserve(nums.size());
-      for (int i = 0; i < nums.size(); i++)
-      {
-        int idx = std::rand() % q.size();
-        auto iter = q.begin();
-        std::advance(iter, idx);
-        ret.push_back(*iter);
-        q.erase(iter);
-      }
-      return ret;
-    }
-
-  private:
-    vector<int> nums;
-  };
-} // namespace
-
-void runSolution()
-{
-  sept21::Solution s{};
-  auto result = s.checkValidString("((*)");
-  LOG(INFO) << result << std::endl;
-}
+  Test() {
+    LOG(INFO) << "Default CTOR";
+  }
+  Test(const Test& t) {
+    LOG(INFO) << "Default COPY-CTOR";
+  }
+  Test(Test&& t) {
+    LOG(INFO) << "Default MOVE-CTOR";
+  }
+  folly::coro::Task<void> func() {
+    co_return;
+  }
+};
 
 int main(int argc, char **argv)
 {
@@ -54,7 +35,8 @@ int main(int argc, char **argv)
   FLAGS_alsologtostderr = 1;
   LOG(INFO) << "GLOG Initialized to " << FLAGS_log_dir << std::endl;
   LOG(INFO) << "Input: Code = " << FLAGS_lccn_code << std::endl;
-  LOG(INFO) << "========= Solution =========" << std::endl;
-  runSolution();
+  auto up = std::make_unique<Test>();
+  auto up1 = std::unique_ptr<Test>(std::move(up));
+  folly::coro::blockingWait(up1->func());
   return 0;
 }
