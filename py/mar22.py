@@ -1,3 +1,5 @@
+from collections import defaultdict
+import enum
 from typing import DefaultDict, List
 import sys
 
@@ -56,6 +58,26 @@ class Solution:
                     ret.append(v)
         return ret
 
+    # https://leetcode-cn.com/problems/count-number-of-maximum-bitwise-or-subsets/
+    def countMaxOrSubsets(self, nums: List[int]) -> int:
+        orMap = defaultdict(lambda: 0)
+        for i in range(len(nums)):
+            num = nums[i]
+            for k, v in list(orMap.items()):
+                orVal = num | k
+                orMap[orVal] = orMap[orVal] + v
+            orMap[num] = orMap[num] + 1
+
+        curMax = -1
+        curVal = 0
+        for k, v in orMap.items():
+            if k > curMax:
+                curMax = k
+                curVal = v
+        return curVal
+
 
 if __name__ == "__main__":
     s = Solution()
+    r = s.countMaxOrSubsets([1, 3])
+    print(f'result={r}')
