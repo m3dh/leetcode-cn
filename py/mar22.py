@@ -76,8 +76,24 @@ class Solution:
                 curVal = v
         return curVal
 
+    def longestWord(self, words: List[str]) -> str:
+        wmap = set(words)
+        word = ""
+        words.sort()
+        for w in words:
+            if len(word) < len(w):
+                match = True
+                for l in range(len(w)-1):
+                    if not w[0:l+1] in wmap:
+                        print(f'break: {w[0:l]}')
+                        match = False
+                        break
+                if match:
+                    word = w
+        return word
+
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.countMaxOrSubsets([1, 3])
+    r = s.longestWord(["w", "wo", "wor", "worl", "world"])
     print(f'result={r}')
