@@ -2,6 +2,7 @@ from collections import defaultdict
 import enum
 from typing import DefaultDict, List
 import sys
+from typing import Optional
 
 
 class Solution:
@@ -92,8 +93,67 @@ class Solution:
                     word = w
         return word
 
+    # https://leetcode-cn.com/problems/the-time-when-the-network-becomes-idle/
+    def networkBecomesIdle(self, edges: List[List[int]], patience: List[int]) -> int:
+        node_cnt = len(patience)
+        dists = [-1] * node_cnt
+        dists[0] = 0
+        conns = defaultdict(lambda: set())
+        for edge in edges:
+            conns[edge[0]].add(edge[1])
+
+        q = [0]
+        dist = 0
+        while (len(q) > 0):
+            dist = dist + 1
+            q_size = len(q)
+            for _ in range(q_size):
+                curr = q.pop(0)
+                for next in conns[curr]:
+                    if -1 == dists[next] or dist < dists[next]:
+                        dists[next] = dist
+                        q.append(next)
+        maxIdle = 0
+        for i in range(node_cnt):
+            if i > 0:
+                curIdle = 0
+                if dists[i] * 2 <= patience[i]:
+                    curIdle = dists[i] * 2 + 1  # starting from next second
+                else:
+                    last_send = (dists[i] * 2 - 1) // patience[i] * patience[i]
+                    curIdle = last_send + dists[i] * 2 + 1
+                maxIdle = max(maxIdle, curIdle)
+        return maxIdle
+
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def findTarget(self, root: Optional[TreeNode], k: int) -> bool:
+        if not root:
+            return False
+
+        nums = set()
+        curr = [root]
+        next = []
+        while len(curr) > 0:
+            for node in curr:
+                rm = k - node.val
+                if rm in nums:
+                    return True
+                nums.add(node.val)
+                if node.left:
+                    next.append(node.left)
+                if node.right:
+                    next.append(node.right)
+            curr = next
+            next = []
+        return False
+
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.longestWord(["w", "wo", "wor", "worl", "world"])
+    r = s.networkBecomesIdle([[0, 1], [0, 2], [1, 2]], [0, 10, 10])
     print(f'result={r}')
