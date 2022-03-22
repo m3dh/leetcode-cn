@@ -1,8 +1,7 @@
 from collections import defaultdict
-import enum
-from typing import DefaultDict, List
+from typing import DefaultDict, Dict, List, Optional
 import sys
-from typing import Optional
+import enum
 
 
 class Solution:
