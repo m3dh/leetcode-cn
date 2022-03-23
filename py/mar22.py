@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import DefaultDict, Dict, List, Optional
+from typing import DefaultDict, Tuple, List, Optional, Dict
 import sys
 import enum
 
@@ -151,8 +151,33 @@ class Solution:
             next = []
         return False
 
+    def findKthNumber5(self, cur: int, ordinal: int, n: int, k: int) -> Tuple[int, int]:
+        # cur must end with 0
+        gap = 0
+        for i in range(0, 10):  # check 0-9
+            if cur + i > n:
+                return gap, -1
+            elif cur + i == 0:
+                continue
+
+            # print(f'check {cur + i} ~ {gap + ordinal + 1}')
+            gap = gap + 1
+            if ordinal + gap == k:
+                return -1, cur + i
+            else:
+                g, v = self.findKthNumber5(10 * (cur + i), ordinal + gap, n, k)
+                if g == -1:
+                    return -1, v
+                else:
+                    gap = gap + g
+        return gap, -1
+
+    def findKthNumber(self, n: int, k: int) -> int:
+        _, val = self.findKthNumber5(0, 0, n, k)
+        return val
+
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.networkBecomesIdle([[0, 1], [0, 2], [1, 2]], [0, 10, 10])
+    r = s.findKthNumber(130, 120)
     print(f'result={r}')
