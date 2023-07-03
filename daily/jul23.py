@@ -8,6 +8,21 @@ class ListNode:
 
 
 class Solution:
+    # https://leetcode.cn/problems/sum-in-a-matrix/
+    def matrixSum(self, nums: List[List[int]]) -> int:
+        for l in nums:
+            # sort descending
+            l.sort(reverse=True)
+        score = 0
+        for i in range(len(nums[0])):
+            curMax = 0
+            for j in range(len(nums)):
+                # find cur max from all rows
+                if nums[j][i] > curMax:
+                    curMax = nums[j][i]
+            score = score + curMax
+        return score
+
     def twoSum(self, nums: List[int], target: int) -> List[int]:
         sortedNums: List[Tuple[int, int]] = []
         for i, n in enumerate(nums):
