@@ -1,4 +1,3 @@
-import json
 from typing import List
 
 
@@ -14,9 +13,9 @@ class Solution:
             if nums[m] == target:
                 return m
             elif nums[m] > target:
-                r = m - 1 # ---> r >= t
+                r = m - 1  # ---> r >= t
             else:
-                l = m + 1 # ---> l <= t
+                l = m + 1  # ---> l <= t
         return l + 1
 
     # https://leetcode.cn/problems/find-first-and-last-position-of-element-in-sorted-array/

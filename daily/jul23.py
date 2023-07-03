@@ -26,7 +26,9 @@ class Solution:
         return [-1, -1]
 
     # https://leetcode.cn/problems/add-two-numbers/
-    def addTwoNumbers1(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+    def addTwoNumbers1(
+            self, l1: Optional[ListNode],
+            l2: Optional[ListNode]) -> Optional[ListNode]:
         dummy = ListNode(val=-1, next=ListNode(val=0))
         prev = dummy
         remaining = 0
@@ -47,7 +49,9 @@ class Solution:
         return dummy.next
 
     # https://leetcode.cn/problems/add-two-numbers-ii/
-    def addTwoNumbers2(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+    def addTwoNumbers2(
+            self, l1: Optional[ListNode],
+            l2: Optional[ListNode]) -> Optional[ListNode]:
         def reverse(l: Optional[ListNode]) -> Optional[ListNode]:
             prev: Optional[ListNode] = None
             if not l:

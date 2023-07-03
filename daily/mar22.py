@@ -1,7 +1,6 @@
 from collections import defaultdict
 from typing import DefaultDict, Tuple, List, Optional, Dict
 import sys
-import enum
 
 
 class Solution:
@@ -93,7 +92,9 @@ class Solution:
         return word
 
     # https://leetcode-cn.com/problems/the-time-when-the-network-becomes-idle/
-    def networkBecomesIdle(self, edges: List[List[int]], patience: List[int]) -> int:
+    def networkBecomesIdle(
+            self, edges: List[List[int]],
+            patience: List[int]) -> int:
         node_cnt = len(patience)
         dists = [-1] * node_cnt
         dists[0] = 0
