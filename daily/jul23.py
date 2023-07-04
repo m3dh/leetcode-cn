@@ -8,6 +8,22 @@ class ListNode:
 
 
 class Solution:
+    # https://leetcode.cn/problems/remove-k-digits/
+    def removeKdigits(self, num: str, k: int) -> str:
+        stack: List[str] = []
+        for n in num:
+            while k > 0 and len(stack) > 0 and stack[-1] > n:
+                stack.pop()  # pop last element
+                k = k - 1
+            stack.append(n)
+        while k > 0:
+            stack.pop()
+            k = k - 1
+        for i, n in enumerate(stack):
+            if n != '0':
+                return ''.join(stack[i:])
+        return '0'
+
     # https://leetcode.cn/problems/sum-in-a-matrix/
     def matrixSum(self, nums: List[List[int]]) -> int:
         for l in nums:
@@ -87,5 +103,5 @@ class Solution:
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.twoSum([1, 2, 3, 4], 5)
+    r = s.removeKdigits("1001", 1)
     print(f'Result={r}')
