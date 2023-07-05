@@ -2,6 +2,25 @@ from typing import List
 
 
 class Solution:
+    # https://leetcode.cn/problems/find-positive-integer-solution-for-a-given-equation/
+    def findSolution(self, customfunction: 'CustomFunction', z: int) -> List[List[int]]:
+        ret: List[List[int]] = []
+        for x in range(1, 1001):
+            if customfunction.f(x, 1) <= z and customfunction.f(x, 1000) >= z:
+                # bi-search y
+                l, r = 1, 1000
+                while l <= r:
+                    m = (l + r) // 2
+                    val = customfunction.f(x, m)
+                    if val == z:
+                        ret.append([x, m])
+                        break
+                    elif val > z:
+                        r = m - 1
+                    else:
+                        l = m + 1
+        return ret
+
     # https://leetcode.cn/problems/search-insert-position/
     def searchInsert(self, nums: List[int], target: int) -> int:
         # 注意：这是一个模板，用 <=, m-1, m+1 可以保证最后 l 是小于 t 的最大数
@@ -39,5 +58,4 @@ class Solution:
 
 
 if __name__ == "__main__":
-    s = Solution()
-    print(s.searchRange(nums=[-1, 0, 3, 5, 9, 12],   target=2))
+    pass

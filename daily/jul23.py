@@ -8,6 +8,18 @@ class ListNode:
 
 
 class Solution:
+    def findSolution(self, customfunction: 'CustomFunction', z: int) -> List[List[int]]:
+        ret: List[List[int]] = []
+        y = 1000
+        for x in range(1, 1001):
+            while y >= 1 and customfunction.f(x, y) > z:
+                y = y - 1
+            if y == 0:
+                break
+            elif customfunction.f(x, y) == z:
+                ret.append([x, y])
+        return ret
+
     # https://leetcode.cn/problems/remove-k-digits/
     def removeKdigits(self, num: str, k: int) -> str:
         stack: List[str] = []
