@@ -1,4 +1,6 @@
 from typing import List, Tuple, Optional
+from heapq import heapify, heappop, heappush
+from enum import Enum
 
 
 class ListNode:
@@ -8,6 +10,19 @@ class ListNode:
 
 
 class Solution:
+    # https://leetcode.cn/problems/two-sum-ii-input-array-is-sorted/
+    def twoSum(self, numbers: List[int], target: int) -> List[int]:
+        l, r = 0, len(numbers) - 1
+        while l < r:
+            sum = numbers[l] + numbers[r]
+            if sum < target:
+                l = l + 1
+            elif sum == target:
+                return [l+1, r+1]
+            else:
+                r = r - 1
+        return []
+
     def findSolution(self, customfunction: 'CustomFunction', z: int) -> List[List[int]]:
         ret: List[List[int]] = []
         y = 1000
