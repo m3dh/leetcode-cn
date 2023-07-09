@@ -10,6 +10,55 @@ class ListNode:
 
 
 class Solution:
+    # https://leetcode.cn/problems/3sum-closest/
+    def threeSumClosest(self, nums: List[int], target: int) -> int:
+        if len(nums) < 3:
+            return -1
+        nums.sort()
+        ret = -1
+        delta = 10**10
+        for i in range(0, len(nums) - 2):
+            l, r = i + 1, len(nums) - 1
+            while l < r:
+                sum = nums[i] + nums[l] + nums[r]
+                ld = abs(target-sum)  # local delta
+                if ld < delta:
+                    delta = ld
+                    ret = sum
+                if sum == target:
+                    return ret
+                elif sum < target:
+                    l = l + 1
+                else:
+                    r = r - 1
+        return ret
+
+    # https://leetcode.cn/problems/3sum/
+    def threeSum(self, nums: List[int]) -> List[List[int]]:
+        if len(nums) < 3:
+            return []
+        ret = []
+        nums.sort()
+        for i in range(0, len(nums) - 2):
+            if i > 0 and nums[i] == nums[i-1]:
+                continue
+            l, r = i + 1, len(nums) - 1
+            while l < r:
+                sum = nums[i] + nums[l] + nums[r]
+                if sum == 0:
+                    ret.append([nums[i], nums[l], nums[r]])
+                    r = r - 1
+
+                    while l < r and nums[l] == nums[l-1]:
+                        l = l + 1
+                    while l < r and nums[r] == nums[r + 1]:
+                        r = r - 1
+                elif sum < 0:
+                    l = l + 1
+                else:
+                    r = r - 1
+        return ret
+
     # https://leetcode.cn/problems/two-sum-ii-input-array-is-sorted/
     def twoSum(self, numbers: List[int], target: int) -> List[int]:
         l, r = 0, len(numbers) - 1
@@ -130,5 +179,5 @@ class Solution:
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.removeKdigits("1001", 1)
+    r = s.threeSumClosest(nums=[0, 2, 1], target=3)
     print(f'Result={r}')
