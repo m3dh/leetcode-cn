@@ -10,6 +10,21 @@ class ListNode:
 
 
 class Solution:
+    # https://leetcode.cn/problems/alternating-digit-sum/
+    def alternateDigitSum(self, n: int) -> int:
+        nums = []
+        while n > 0:
+            num = n % 10
+            n = n // 10
+            nums.append(num)
+        nums.reverse()
+        ret = 0
+        sg = 1
+        for num in nums:
+            ret = ret + num * sg
+            sg = sg * -1
+        return ret
+
     # https://leetcode.cn/problems/3sum-closest/
     def threeSumClosest(self, nums: List[int], target: int) -> int:
         if len(nums) < 3:
@@ -179,5 +194,5 @@ class Solution:
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.threeSumClosest(nums=[0, 2, 1], target=3)
+    r = s.alternateDigitSum(886996)
     print(f'Result={r}')
