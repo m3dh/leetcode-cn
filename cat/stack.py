@@ -51,4 +51,4 @@ class MyStack:
         self.stack = tempst
 
     def empty(self) -> bool:
-        return 0 == len(self.queue)
+        return 0 == len(self.queue) + len(self.stack)

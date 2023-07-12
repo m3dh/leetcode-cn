@@ -10,6 +10,19 @@ class ListNode:
 
 
 class Solution:
+    # https://leetcode.cn/problems/minimum-falling-path-sum/
+    def minFallingPathSum(self, matrix: List[List[int]]) -> int:
+        n = len(matrix)
+        dp = [[0] * n for _ in range(n)]
+        imax = 10 ** 20
+        for x in range(n):
+            for y in range(n):
+                prev = dp[x-1][y] if x > 0 else 0
+                prev = min(prev, dp[x-1][y-1] if x > 0 and y > 0 else imax)
+                prev = min(prev, dp[x-1][y+1] if x > 0 and y < n - 1 else imax)
+                dp[x][y] = matrix[x][y] + prev
+        return min(dp[-1])
+
     # https://leetcode.cn/problems/alternating-digit-sum/
     def alternateDigitSum(self, n: int) -> int:
         nums = []
