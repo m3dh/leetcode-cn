@@ -1,6 +1,7 @@
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Set, Dict
 from heapq import heapify, heappop, heappush
 from enum import Enum
+import json
 
 
 class ListNode:
@@ -9,7 +10,79 @@ class ListNode:
         self.next = next
 
 
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+
 class Solution:
+    # https://leetcode.cn/problems/find-eventual-safe-states/
+    def eventualSafeNodes(self, graph: List[List[int]]) -> List[int]:
+        def isSafe(
+                ix: int, term: List[bool],
+                safe: Dict[int, bool],
+                visited: Set[int]) -> bool:
+            nonlocal graph
+            if term[ix]:
+                return True
+            elif ix in safe and safe[ix]:
+                return safe[ix]
+            elif ix in visited:
+                safe[ix] = False
+                return False
+            else:
+                visited.add(ix)
+                ret = all(
+                    [isSafe(nx, term, safe, visited) for nx in graph[ix]])
+                safe[ix] = ret
+                return ret
+
+        term = [len(g) == 0 for g in enumerate(graph)]
+        safe: Dict[int, bool] = {}
+        ret = [i for i in range(len(graph)) if isSafe(i, term, safe, set())]
+        return ret
+
+    # https://leetcode.cn/problems/distribute-coins-in-binary-tree/
+    def distributeCoins(self, root: Optional[TreeNode]) -> int:
+        count = 0
+
+        def traverse(root: TreeNode) -> int:
+            nonlocal count
+            l = traverse(root.left) if root.left is not None else 0
+            r = traverse(root.right) if root.right is not None else 0
+            remain = l + r + root.val - 1
+            count = count + abs(l) + abs(r)
+            return remain
+        if root is not None:
+            traverse(root)
+        return count
+
+    # https://leetcode.cn/problems/course-schedule/
+    def canFinish(
+            self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        inDegree: List[Set[int]] = [set() for _ in range(numCourses)]
+        nextCourses: List[Set[int]] = [set() for _ in range(numCourses)]
+        for pair in prerequisites:
+            cur, pre = pair
+            inDegree[cur].add(pre)
+            nextCourses[pre].add(cur)
+
+        queue: List[int] = []
+        for cur, ind in enumerate(inDegree):
+            if len(ind) == 0:
+                queue.append(cur)
+
+        while len(queue) > 0:
+            cur = queue.pop(0)
+            for nextCourse in nextCourses[cur]:
+                ind: Set[int] = inDegree[nextCourse]
+                ind.remove(cur)
+                if len(ind) == 0:
+                    queue.append(nextCourse)
+        return all([len(ind) == 0 for ind in inDegree])
+
     # https://leetcode.cn/problems/minimum-falling-path-sum/
     def minFallingPathSum(self, matrix: List[List[int]]) -> int:
         n = len(matrix)
@@ -207,5 +280,5 @@ class Solution:
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.alternateDigitSum(886996)
-    print(f'Result={r}')
+    r = s.eventualSafeNodes([[], [0, 2, 3, 4], [3], [4], []])
+    print(f'Result={json.dumps(r)}')
