@@ -18,6 +18,49 @@ class TreeNode:
 
 
 class Solution:
+    # https://leetcode.cn/problems/sum-of-distances-in-tree/
+    def sumOfDistancesInTree(self, n: int, edges: List[List[int]]) -> List[int]:
+        # bottom-up
+        def collect(
+                cur: int, paths: List[List[int]],
+                colls: List[List[int]],
+                parent: int) -> List[int]:
+            sum = 0
+            cnt = 1  # self
+            for nxt in paths[cur]:
+                if parent != nxt:
+                    nxtCollect = collect(nxt, paths, colls, cur)
+                    cnt = cnt + nxtCollect[1]
+                    sum = sum + nxtCollect[0] + nxtCollect[1]
+            colls[cur] = [sum, cnt]
+            return colls[cur]
+
+        # top-down
+        def deploy(  # up = [sum, cnt]
+                cur: int, up: List[int], paths: List[List[int]],
+                colls: List[List[int]],
+                res: List[int],
+                parent: int) -> None:
+            res[cur] = up[0] + up[1] + colls[cur][0]  # up_sum + up_cnt
+            for nxt in paths[cur]:
+                if parent != nxt:
+                    upsum = colls[cur][0] - colls[nxt][0] - colls[nxt][1] + up[0] + up[1]
+                    upcnt = colls[cur][1] - colls[nxt][1] + up[1]
+                    nup = [upsum, upcnt]
+                    deploy(nxt, nup, paths, colls, res, cur)
+
+        # edges -> paths
+        paths: List[List[int]] = [[] for _ in range(n)]
+        colls: List[List[int]] = [[0, 0] for _ in range(n)]  # [sum, cnt]
+        res: List[int] = [0] * n
+        for edge in edges:
+            paths[edge[0]].append(edge[1])
+            paths[edge[1]].append(edge[0])
+
+        collect(0, paths, colls, -1)
+        deploy(0, [0, 0], paths, colls, res, -1)
+        return res
+
     # https://leetcode.cn/problems/maximum-number-of-events-that-can-be-attended-ii/
     def maxValue(self, events: List[List[int]], k: int) -> int:
         def maxValRec(
@@ -312,13 +355,6 @@ class Solution:
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.maxValue(
-        [[21, 77, 43],
-         [2, 74, 47],
-         [6, 59, 22],
-         [47, 47, 38],
-         [13, 74, 57],
-         [27, 55, 27],
-         [8, 15, 8]],
-        4)
+    r = s.sumOfDistancesInTree(
+        n=2, edges=[[0, 1]])
     print(f'Result={json.dumps(r)}')
