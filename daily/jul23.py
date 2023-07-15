@@ -18,6 +18,38 @@ class TreeNode:
 
 
 class Solution:
+    # https://leetcode.cn/problems/maximum-number-of-events-that-can-be-attended-ii/
+    def maxValue(self, events: List[List[int]], k: int) -> int:
+        def maxValRec(
+                events: List[List[int]],
+                k: int, ix: int, memo: List[List[int]]) -> int:
+            if k == 0 or ix >= len(events):
+                return 0
+            maxVal = memo[ix][k]
+            if maxVal >= 0:
+                return maxVal
+            else:
+                endDay = events[ix][1]
+
+                # don't pick
+                maxVal = max(events[ix][2], maxValRec(events, k, ix + 1, memo))
+
+                # pick it
+                l, r = ix + 1, len(events) - 1
+                while l <= r:
+                    m = (l + r) // 2
+                    if events[m][0] <= endDay:
+                        l = l + 1
+                    else:
+                        r = r - 1
+                maxVal = max(maxVal, events[ix][2] +
+                             maxValRec(events, k - 1, l, memo))
+                memo[ix][k] = maxVal
+                return maxVal
+        memo = [[-1] * (k+1) for _ in range(len(events))]
+        events.sort(key=lambda ev: ev[0])
+        return maxValRec(events, k, 0, memo)
+
     # https://leetcode.cn/problems/find-eventual-safe-states/
     def eventualSafeNodes(self, graph: List[List[int]]) -> List[int]:
         def isSafe(
@@ -280,5 +312,13 @@ class Solution:
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.eventualSafeNodes([[], [0, 2, 3, 4], [3], [4], []])
+    r = s.maxValue(
+        [[21, 77, 43],
+         [2, 74, 47],
+         [6, 59, 22],
+         [47, 47, 38],
+         [13, 74, 57],
+         [27, 55, 27],
+         [8, 15, 8]],
+        4)
     print(f'Result={json.dumps(r)}')
