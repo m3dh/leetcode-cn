@@ -18,6 +18,80 @@ class TreeNode:
 
 
 class Solution:
+    # https://leetcode.cn/problems/add-strings/
+    def addStrings(self, num1: str, num2: str) -> str:
+        l1 = len(num1)
+        l2 = len(num2)
+        val: List[str] = []
+        c = 0
+        for i in range(1, max(l1, l2)+1):
+            n1 = num1[l1-i] if l1 - i >= 0 else '0'
+            n2 = num2[l2-i] if l2 - i >= 0 else '0'
+            n = c + ord(n1) + ord(n2) - ord('0') * 2
+            c = n // 10
+            n = n % 10
+            val.append(n)
+        if c > 0:
+            val.append(c)
+        val.reverse()
+        return ''.join(map(str, val))
+
+    # https://leetcode.cn/problems/smallest-sufficient-team/
+    def smallestSufficientTeam(
+            self, req_skills: List[str],
+            people: List[List[str]]) -> List[int]:
+        def dfs(
+                cur: int, tar: int, pskills: List[int],
+                memo: Dict[int, List[int]]) -> List[int]:
+            if cur == tar:
+                return []
+
+            m = memo.get(cur)
+            if m is not None:
+                return m
+            else:
+                sel = None
+                nix = -1
+                for ix, pmask in enumerate(pskills):
+                    neo = cur | pmask
+                    if neo != cur:
+                        np = dfs(neo, tar, pskills, memo)
+                        if sel is None or len(sel) > len(np):
+                            sel = np
+                            nix = ix
+                m = sel.copy()
+                m.append(nix)
+                memo[cur] = m
+                return m
+
+        skill = 1
+        skills = {}
+        tar_skills = 0
+        for s in req_skills:
+            tar_skills = tar_skills | skill
+            skills[s] = skill
+            skill = skill << 1
+
+        pskills: List[int] = [0] * len(people)
+        for ix, ps in enumerate(people):
+            pmask = 0
+            for s in ps:
+                if s in skills:
+                    pmask = pmask | skills[s]
+            pskills[ix] = pmask
+        return dfs(0, tar_skills, pskills, {})
+
+    # https://leetcode.cn/problems/longest-arithmetic-subsequence-of-given-difference/
+    def longestSubsequence(self, arr: List[int], difference: int) -> int:
+        dp: Dict[int, int] = {}
+        for n in arr:
+            prev = dp.get(n - difference)
+            if prev is not None:
+                dp[n] = max(prev + 1, dp.get(n) or 1)
+            elif n not in dp:
+                dp[n] = 1
+        return max(dp.values())
+
     # https://leetcode.cn/problems/sum-of-distances-in-tree/
     def sumOfDistancesInTree(self, n: int, edges: List[List[int]]) -> List[int]:
         # bottom-up
@@ -355,6 +429,12 @@ class Solution:
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.sumOfDistancesInTree(
-        n=2, edges=[[0, 1]])
+    r = s.smallestSufficientTeam(
+        req_skills=["algorithms", "math", "java", "reactjs", "csharp", "aws"],
+        people=[["algorithms", "math", "java"],
+                ["algorithms", "math", "reactjs"],
+                ["java", "csharp", "aws"],
+                ["reactjs", "csharp"],
+                ["csharp", "math"],
+                ["aws", "java"]])
     print(f'Result={json.dumps(r)}')
