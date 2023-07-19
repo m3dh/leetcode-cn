@@ -1,5 +1,5 @@
 from typing import List, Tuple, Optional, Set, Dict
-from heapq import heapify, heappop, heappush
+from heapq import heappop, heappush
 from enum import Enum
 import json
 
@@ -18,6 +18,63 @@ class TreeNode:
 
 
 class Solution:
+    # https://leetcode.cn/problems/non-overlapping-intervals/
+    def eraseOverlapIntervals(self, intervals: List[List[int]]) -> int:
+        # greedy!
+        intervals.sort(key=lambda interval: interval[1])
+        length = 1
+        r = intervals[0][1]
+        for i in range(1, len(intervals)):
+            if intervals[i][0] >= r:
+                r = intervals[i][1]
+                length = length + 1
+        return len(intervals) - length
+
+    # https://leetcode.cn/problems/walking-robot-simulation/
+    def robotSim(self, commands: List[int], obstacles: List[List[int]]) -> int:
+        dir = 0
+        dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]]  # R ===>
+        x, y = 0, 0
+        maxDist = 0
+        obs = set(obstacles)
+        for cmd in commands:
+            if cmd == -1:
+                d = (d + 1) % 4
+            elif cmd == -2:
+                d = (d + 3) % 4
+            else:
+                for _ in range(cmd):
+                    nx, ny = x + dirs[dir][0], y + dirs[dir][1]
+                    if [nx, ny] in obs:
+                        break
+                    else:
+                        x, y = nx, ny
+                        maxDist = max(maxDist, x * x + y * y)
+        return maxDist
+
+    # https://leetcode.cn/problems/minimum-interval-to-include-each-query/
+    def minInterval(
+            self, intervals: List[List[int]],
+            queries: List[int]) -> List[int]:
+        result = [-1] * len(queries)
+        intervals.sort(key=lambda interval: interval[0])
+        myQueries = [(q, ix) for ix, q in enumerate(queries)]
+        myQueries.sort()
+        candidates = []
+        iix = 0
+        for q, ix in myQueries:
+            while iix < len(intervals) and intervals[iix][0] <= q:
+                intervalLen = intervals[iix][1] - intervals[iix][0] + 1
+                heappush(candidates, (intervalLen, intervals[iix]))
+                iix = iix + 1
+            while len(candidates) > 0 and candidates[0][1][1] < q:
+                heappop(candidates)
+            if len(candidates) > 0:
+                candiLength, candidate = candidates[0]
+                if candidate[0] <= q and candidate[1] >= q:
+                    result[ix] = candiLength
+        return result
+
     # https://leetcode.cn/problems/add-strings/
     def addStrings(self, num1: str, num2: str) -> str:
         l1 = len(num1)
@@ -429,12 +486,6 @@ class Solution:
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.smallestSufficientTeam(
-        req_skills=["algorithms", "math", "java", "reactjs", "csharp", "aws"],
-        people=[["algorithms", "math", "java"],
-                ["algorithms", "math", "reactjs"],
-                ["java", "csharp", "aws"],
-                ["reactjs", "csharp"],
-                ["csharp", "math"],
-                ["aws", "java"]])
+    r = s.minInterval(
+        intervals=[[2, 3], [2, 5], [1, 8], [20, 25]], queries=[2, 19, 5, 22])
     print(f'Result={json.dumps(r)}')
