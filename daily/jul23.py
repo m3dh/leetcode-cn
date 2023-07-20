@@ -18,6 +18,31 @@ class TreeNode:
 
 
 class Solution:
+    # https://leetcode.cn/problems/maximum-subarray/
+    def maxSubArray(self, nums: List[int]) -> int:
+        dp = nums.copy()
+        for i in range(1, len(dp)):
+            dp[i] = max(dp[i], dp[i-1] + dp[i])
+        return max(dp)
+
+    # https://leetcode.cn/problems/maximum-sum-circular-subarray/
+    def maxSubarraySumCircular(self, nums: List[int]) -> int:
+        c1 = self.maxSubArray(nums)
+        c2 = 0
+        n = len(nums)
+        r_side_max = [0] * n
+        r_side_max[-1] = nums[-1]
+        r_sum = nums[-1]
+        for i in range(n-2, -1, -1):
+            r_sum = nums[i] + r_sum
+            r_side_max[i] = max(r_sum, r_side_max[i+1])
+
+        l_sum = 0
+        for l in range(n-1):
+            l_sum = l_sum + nums[l]
+            c2 = max(c2, l_sum + r_side_max[l+1])
+        return max(c1, c2)
+
     # https://leetcode.cn/problems/non-overlapping-intervals/
     def eraseOverlapIntervals(self, intervals: List[List[int]]) -> int:
         # greedy!
@@ -486,6 +511,6 @@ class Solution:
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.minInterval(
-        intervals=[[2, 3], [2, 5], [1, 8], [20, 25]], queries=[2, 19, 5, 22])
+    r = s.maxSubarraySumCircular(
+        [5, -3, 5])
     print(f'Result={json.dumps(r)}')
