@@ -1,6 +1,7 @@
 from typing import List, Tuple, Optional, Set, Dict
 from heapq import heappop, heappush
 from enum import Enum
+from collections import deque
 import json
 
 
@@ -18,6 +19,37 @@ class TreeNode:
 
 
 class Solution:
+    # https://leetcode.cn/problems/max-value-of-equation/
+    def findMaxValueOfEquation(self, points: List[List[int]], k: int) -> int:
+        q = deque()  # [[ix, yj-xj]]
+        ret = -10 ** 9
+        for i in range(len(points)):
+            while len(q) > 0 and q[0][0] < points[i][0] - k:
+                q.popleft()
+            if len(q):  # THIS IS THE KEY!!!!
+                ret = max(ret, points[i][1] + points[i][0] + q[0][1])
+            cur = points[i][1] - points[i][0]
+            while len(q) and q[-1][1] < cur:
+                q.pop()
+            q.append([points[i][0], cur])
+        return ret
+
+    # https://leetcode.cn/problems/sliding-window-maximum/
+    def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:
+        q = deque()
+        ret = [0] * (len(nums) - k + 1)
+        for i in range(len(nums)):
+            while len(q) > 0 and q[0][0] <= i - k:
+                q.popleft()
+
+            while len(q) > 0 and q[-1][1] < nums[i]:
+                q.pop()
+
+            q.append([i, nums[i]])
+            if i >= k - 1:
+                ret[i - k + 1] = q[0][1]
+        return ret
+
     # https://leetcode.cn/problems/maximum-subarray/
     def maxSubArray(self, nums: List[int]) -> int:
         dp = nums.copy()
@@ -511,6 +543,6 @@ class Solution:
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.maxSubarraySumCircular(
-        [5, -3, 5])
+    r = s.findMaxValueOfEquation(
+        points=[[1, 3], [2, 0], [5, 10], [6, -10]], k=1)
     print(f'Result={json.dumps(r)}')
