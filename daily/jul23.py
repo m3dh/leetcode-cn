@@ -19,6 +19,44 @@ class TreeNode:
 
 
 class Solution:
+    # https://leetcode.cn/problems/number-of-longest-increasing-subsequence/
+    def findNumberOfLIS(self, nums: List[int]) -> int:
+        ldp = [1] * len(nums)
+        cdp = [1] * len(nums)
+        for i in range(len(nums)):
+            for j in range(0, i):
+                if nums[i] > nums[j]:
+                    if ldp[j] + 1 > ldp[i]:
+                        ldp[i] = ldp[j] + 1
+                        cdp[i] = cdp[j]
+                    elif ldp[j] + 1 == ldp[i]:
+                        cdp[i] = cdp[i] + cdp[j]
+        mx = max(ldp)
+        return sum([cnt for ix, cnt in enumerate(cdp) if ldp[ix] == mx])
+
+    # https://leetcode.cn/problems/longest-increasing-subsequence/
+
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        if len(nums) == 0:
+            return 0
+        lis = [nums[0]]
+        for i in range(1, len(nums)):
+            if nums[i] > lis[-1]:
+                lis.append(nums[i])
+            else:
+                l, r = 0, len(lis) - 1
+                while l <= r:
+                    m = (l + r) // 2
+                    if lis[m] == nums[i]:
+                        break
+                    elif lis[m] < nums[i]:
+                        l = m + 1
+                    else:
+                        r = m - 1
+                if l < len(lis) and lis[l] > nums[i]:
+                    lis[l] = nums[i]
+        return len(lis)
+
     # https://leetcode.cn/problems/max-value-of-equation/
     def findMaxValueOfEquation(self, points: List[List[int]], k: int) -> int:
         q = deque()  # [[ix, yj-xj]]
@@ -543,6 +581,6 @@ class Solution:
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.findMaxValueOfEquation(
-        points=[[1, 3], [2, 0], [5, 10], [6, -10]], k=1)
+    r = s.findNumberOfLIS(
+        [5, 5, 5, 5])
     print(f'Result={json.dumps(r)}')
