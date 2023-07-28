@@ -19,6 +19,57 @@ class TreeNode:
 
 
 class Solution:
+    # https://leetcode.cn/problems/parallel-courses-iii/
+    def minimumTime(
+            self, n: int, relations: List[List[int]],
+            time: List[int]) -> int:
+        prev_cnts = [0] * n
+        curr_time = [time[ix] for ix in range(n)]
+        next_curs = [[] for _ in range(n)]
+        for relation in relations:
+            next_curs[relation[0]-1].append(relation[1]-1)
+            prev_cnts[relation[1]-1] = prev_cnts[relation[1]-1] + 1
+        q = deque([ix for ix in range(n) if prev_cnts[ix] == 0])
+        while len(q) > 0:
+            curs = q.popleft()
+            for next in next_curs[curs]:
+                prev_cnts[next] = prev_cnts[next] - 1
+                curr_time[next] = max(
+                    curr_time[next],
+                    time[next] + curr_time[curs])
+                if prev_cnts[next] == 0:
+                    q.append(next)
+        return max(curr_time)
+
+    # https://leetcode.cn/problems/merge-intervals/
+    def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+        intervals.sort(key=lambda interval: interval[0])
+        ret = []
+        pre = intervals[0]
+        for i in range(1, len(intervals)):
+            cur = intervals[i]
+            if pre[1] < cur[0]:
+                ret.append(pre)
+                pre = cur
+            else:
+                pre[1] = max(pre[1], cur[1])
+        ret.append(pre)
+        return ret
+
+    # https://leetcode.cn/problems/trapping-rain-water/
+    def trap(self, height: List[int]) -> int:
+        st = []
+        ret = 0
+        for ix, h in enumerate(height):
+            while len(st) > 0 and (curH := height[st[-1]]) <= h:
+                st.pop(-1)
+                if len(st) > 0:
+                    prevH = height[st[-1]]
+                    width = ix - st[-1] - 1
+                    ret = ret + width * (min(prevH, h) - curH)
+            st.append(ix)
+        return ret
+
     # https://leetcode.cn/problems/number-of-longest-increasing-subsequence/
     def findNumberOfLIS(self, nums: List[int]) -> int:
         ldp = [1] * len(nums)
