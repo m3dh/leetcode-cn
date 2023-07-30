@@ -19,6 +19,67 @@ class TreeNode:
 
 
 class Solution:
+    def build(self, nums) -> ListNode:
+        head = ListNode()
+        prev = head
+        for n in nums:
+            prev.next = ListNode(n)
+            prev = prev.next
+        return head.next
+
+    def formatList(self, head):
+        nums = []
+        while head:
+            nums.append(str(head.val))
+            head = head.next
+        return ", ".join(nums)
+
+    def reorderList(self, head: Optional[ListNode]) -> None:
+        """
+        https://leetcode.cn/problems/reorder-list/description/
+        Do not return anything, modify head in-place instead.
+        """
+        def lengthOf(head) -> int:
+            l = 0
+            while head:
+                head = head.next
+                l = l + 1
+            return l
+
+        def forward(head, l) -> ListNode:
+            for _ in range(l):
+                head = head.next
+            return head
+
+        def reverse(head) -> ListNode:
+            prev = None
+            next = head
+            while next:
+                pnext = next.next
+                next.next = prev
+                prev = next
+                next = pnext
+            return prev
+
+        def merge(first, second) -> ListNode:
+            head = ListNode()
+            prev = head
+            while first or second:
+                prev.next = first
+                first = first.next
+                prev = prev.next
+                prev.next = second
+                if second:
+                    second = second.next
+                    prev = prev.next
+            return head.next
+        fullLength = lengthOf(head)
+        if fullLength > 0:
+            midpoint = forward(head, (fullLength - 1) // 2)
+            first, second = head, reverse(midpoint.next)
+            midpoint.next = None
+            merge(first, second)
+
     # https://leetcode.cn/problems/parallel-courses-iii/
     def minimumTime(
             self, n: int, relations: List[List[int]],
@@ -632,6 +693,6 @@ class Solution:
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.findNumberOfLIS(
-        [5, 5, 5, 5])
-    print(f'Result={json.dumps(r)}')
+    r = s.build(
+        [])
+    print(s.formatList(s.reorderList(r)))
