@@ -82,9 +82,9 @@ class Solution:
         for w in words:
             if len(word) < len(w):
                 match = True
-                for l in range(len(w)-1):
-                    if not w[0:l+1] in wmap:
-                        print(f'break: {w[0:l]}')
+                for l in range(len(w) - 1):
+                    if not w[0 : l + 1] in wmap:
+                        print(f"break: {w[0:l]}")
                         match = False
                         break
                 if match:
@@ -92,9 +92,7 @@ class Solution:
         return word
 
     # https://leetcode-cn.com/problems/the-time-when-the-network-becomes-idle/
-    def networkBecomesIdle(
-            self, edges: List[List[int]],
-            patience: List[int]) -> int:
+    def networkBecomesIdle(self, edges: List[List[int]], patience: List[int]) -> int:
         node_cnt = len(patience)
         dists = [-1] * node_cnt
         dists[0] = 0
@@ -104,7 +102,7 @@ class Solution:
 
         q = [0]
         dist = 0
-        while (len(q) > 0):
+        while len(q) > 0:
             dist = dist + 1
             q_size = len(q)
             for _ in range(q_size):
@@ -181,4 +179,4 @@ class Solution:
 if __name__ == "__main__":
     s = Solution()
     r = s.findKthNumber(130, 120)
-    print(f'result={r}')
+    print(f"result={r}")
