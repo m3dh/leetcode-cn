@@ -120,9 +120,49 @@ class Solution:
                 # print(f"{l}, {r}, {subLen}, {sum}, {cnt}")
         return cnt
 
+    def findDiagonalOrder(self, mat: List[List[int]]) -> List[int]:
+        if len(mat) == 0:
+            return []
+        n = len(mat)
+        m = len(mat[0])
+        ret = []
+        rev = False
+        s = 0
+        while True:
+            fnd = False
+            i = s
+            j = 0
+            loc = []
+            while i >= 0:
+                if i >= 0 and i < n and j < m:
+                    loc.append(mat[i][j])
+                    fnd = True
+                i = i - 1
+                j = j + 1
+            if len(loc) > 0:
+                ret.extend(reversed(loc) if rev else loc)
+                rev = not rev
+
+            if not fnd:
+                break
+            else:
+                s = s + 1
+        return ret
+
+    # VB4NIUN95X
+    def rob(self, nums: List[int]) -> int:
+        if len(nums) == 1:
+            return nums[0]
+
+        dp = [0] * len(nums)
+        for i in range(len(nums)):
+            n = 0 if i == 0 else dp[i - 1]
+            s = 0 if i <= 1 else dp[i - 2]
+            dp[i] = max(n, s + nums[i])
+        return max(dp[-1], dp[-2])
+
 
 if __name__ == "__main__":
     s = Solution()
-    nums = [1, 1, 1]
-    r = s.countSubarrays(nums, 5)
-    print(r)
+    r = s.rob([1, 2, 3, 1])
+    print(f"r ==> {r}")
