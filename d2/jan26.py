@@ -221,6 +221,24 @@ class Solution:
         dfs([], 0)
         return ret
 
+    def longestValidParentheses(self, s: str) -> int:
+        # n
+        ans = 0
+        stk = [-1]
+        for i in range(len(s)):
+            print(f"{i} => {stk}")
+            if s[i] == "(":
+                stk.append(i)
+            else:
+                if len(stk) > 0:
+                    ans = max(ans, stk.pop())
+
+                if len(stk) > 0:
+                    ans = max(ans, i - stk[-1])
+                else:
+                    stk.append(i)
+        return ans
+
     def findSubstring(self, s: str, words: List[str]) -> List[int]:
         ret = []
         if len(words) == 0 or len(s) < len(words[0]) * len(words):
@@ -278,5 +296,5 @@ class Solution:
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.solveNQueens(24)
+    r = s.longestValidParentheses("()(()")
     print(f"r ==> {r}")
