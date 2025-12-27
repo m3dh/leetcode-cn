@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Set
 from functools import cmp_to_key
 
 
@@ -140,8 +140,143 @@ class Solution:
             nums[wp] = 0
             wp = wp + 1
 
+    def minPathSum(self, grid: List[List[int]]) -> int:
+        memo = []
+        for row in grid:
+            memo.append([-1] * len(row))
+
+        def dfsMinPath(x: int, y: int, memo: List[List[int]]) -> int:
+            nonlocal grid
+            if memo[x][y] != -1:
+                return memo[x][y]
+
+            fr, fd = -1, -1
+            if x + 1 < len(grid):
+                fr = grid[x][y] + dfsMinPath(x + 1, y, memo)
+            if y + 1 < len(grid[x]):
+                fd = grid[x][y] + dfsMinPath(x, y + 1, memo)
+
+            if fr == -1 and fd == -1:
+                memo[x][y] = grid[x][y]
+            else:
+                memo[x][y] = min(
+                    fr if fr != -1 else float("inf"), fd if fd != -1 else float("inf")
+                )
+            return memo[x][y]
+
+        return dfsMinPath(0, 0, memo)
+
+    def countNegatives(self, grid: List[List[int]]) -> int:
+        if len(grid) == 0 or len(grid[0]) == 0:
+            return 0
+
+        x, y, cnt = 0, len(grid[0]) - 1, 0
+
+        # find the first neg in each row or end (no negative)
+        # move left and down
+        while x < len(grid):
+            while y > 0 and grid[x][y - 1] < 0:
+                y = y - 1  # y: [0, len(grid-1)]
+
+            if grid[x][y] < 0:
+                cnt = cnt + len(grid[x]) - y
+
+            x = x + 1
+
+        return cnt
+
+    def solveNQueens(self, n: int) -> List[List[str]]:
+        ret = []
+
+        def dfs(cur: List[int], s: int) -> None:
+            if s == n:
+                sol = []
+                for c in cur:
+                    line = []
+                    for i in range(n):
+                        if c == i:
+                            line.append("Q")
+                        else:
+                            line.append(".")
+                    sol.append("".join(line))
+                ret.append(sol)
+            else:
+                for i in range(n):
+                    valid = True
+                    for j, p in enumerate(cur):
+                        if p == i:
+                            valid = False
+                            break
+                        elif i + (s - j) == p:
+                            valid = False
+                            break
+                        elif i - (s - j) == p:
+                            valid = False
+                            break
+                    if valid:
+                        cur.append(i)
+                        dfs(cur, s + 1)
+                        cur.pop()
+
+        dfs([], 0)
+        return ret
+
+    def findSubstring(self, s: str, words: List[str]) -> List[int]:
+        ret = []
+        if len(words) == 0 or len(s) < len(words[0]) * len(words):
+            return ret
+
+        def update_and_check_count(word_cnt, word, num) -> bool:
+            if word in word_cnt:
+                word_cnt[word] += num
+            else:
+                word_cnt[word] = num
+
+            if word_cnt[word] == 0:
+                del word_cnt[word]
+
+            return len(word_cnt) == 0
+
+        # the key idea is to window the word length as well!
+        word_len = len(words[0])
+        full_len = len(words) * word_len
+        for i in range(word_len):
+            l = i
+            r = i
+            word_cnt = {}  # idea: expected words start with cnt = -1
+            for word in words:
+                if word in word_cnt:
+                    word_cnt[word] -= 1
+                else:
+                    word_cnt[word] = -1
+
+            while r < len(s):
+                print(f"{i}, {l}, {r}")
+                curr_len = r - l
+                if curr_len < full_len:
+                    # take one word in
+                    r = r + word_len
+                    if r - 1 < len(s):
+                        word = s[r - word_len : r]
+                        curr_len = r - l
+                        # print(f"I={i}, In: {word} ({r})")
+                        if (
+                            update_and_check_count(word_cnt, word, 1)
+                            and curr_len == full_len
+                        ):
+                            ret.append(l)
+
+                print(f"{curr_len}, {full_len}")
+                if curr_len == full_len:
+                    # take one word out
+                    l = l + word_len
+                    word = s[l - word_len : l]
+                    # print(f"I={i}, Out: {word} ({l})")
+                    update_and_check_count(word_cnt, word, -1)
+        return ret
+
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.mostBooked(3, [[1, 20], [2, 10], [3, 5], [4, 9], [6, 8]])
+    r = s.solveNQueens(24)
     print(f"r ==> {r}")
