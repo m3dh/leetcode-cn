@@ -1,5 +1,6 @@
-from typing import List, Set
+from typing import List, Set, Optional
 from functools import cmp_to_key
+import heapq
 
 
 class Solution:
@@ -60,8 +61,6 @@ class Solution:
         return arr[amount]
 
     def mostBooked(self, n: int, meetings: List[List[int]]) -> int:
-        import heapq
-
         rooms_avl = []
         rooms_cnt = []
         rooms_use = []
@@ -226,17 +225,17 @@ class Solution:
         ans = 0
         stk = [-1]
         for i in range(len(s)):
-            print(f"{i} => {stk}")
             if s[i] == "(":
                 stk.append(i)
             else:
                 if len(stk) > 0:
-                    ans = max(ans, stk.pop())
+                    stk.pop()
 
                 if len(stk) > 0:
                     ans = max(ans, i - stk[-1])
                 else:
                     stk.append(i)
+
         return ans
 
     def findSubstring(self, s: str, words: List[str]) -> List[int]:
@@ -293,8 +292,310 @@ class Solution:
                     update_and_check_count(word_cnt, word, -1)
         return ret
 
+    def pyramidTransition(self, bottom: str, allowed: List[str]) -> bool:
+        allowed_map = {}
+        for allow in allowed:
+            k = allow[:2]
+            v = allow[2:]
+            allowed_map.setdefault(k, []).append(v)
+
+        def dmffr(cur: str, nxt: List[str], results: Set[str], ix: int) -> None:
+            if ix == len(cur) - 1:
+                results.add("".join(nxt))
+            else:
+                k = "".join(cur[ix : ix + 2])
+                if vals := allowed_map.get(k):
+                    for val in vals:
+                        nxt[ix] = val
+                        dmffr(cur, nxt, results, ix + 1)
+
+        def dmffs(b: str, failed: Set[str]) -> bool:
+            if len(b) == 1:
+                return True
+            nxt = [""] * (len(b) - 1)
+            nxs = set()
+            dmffr(b, nxt, nxs, 0)
+            for nx in nxs:
+                # print(f"From {b} -> {nx}")
+                if nx not in failed:
+                    su = dmffs(nx, failed)
+                    if su:
+                        return True
+                    failed.add(nx)
+            return False
+
+        return dmffs(bottom, set())
+
+    def rotate(self, nums: List[int], k: int) -> None:
+        for _ in range(k):
+            prev = nums[-1]
+            for i in range(nums):
+                cur = nums[i]
+                nums[i] = prev
+                prev = cur
+
+    def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:
+        decending_queue = []  # index queue
+        results = []
+        for i in range(len(nums)):
+            # 0, 1, 2, 3 / k = 2
+            #       ^
+            while len(decending_queue) > 0 and decending_queue[0] <= i - k:
+                # pop numbers out of the window
+                decending_queue.pop(0)
+
+            while len(decending_queue) > 0 and nums[decending_queue[-1]] <= nums[i]:
+                # pop numbers that are smaller (overriden)
+                decending_queue.pop(-1)
+
+            decending_queue.append(i)
+            if i >= k - 1:
+                results.append(nums[decending_queue[0]])
+
+        return results
+
+    def findAnagrams(self, s, p):
+        ctr = {}
+        ix = []
+        for pc in p:
+            if pcnt := ctr.get(pc):
+                ctr[pc] = pcnt - 1
+            else:
+                ctr[pc] = -1
+        l, r = 0, 0
+        while r < len(s):
+            nx = s[r]
+            r = r + 1
+            if nxcnt := ctr.get(nx):
+                if nxcnt == -1:
+                    del ctr[nx]  # eq 0
+                else:
+                    ctr[nx] = nxcnt + 1
+            else:
+                ctr[nx] = 1
+
+            if r - l == len(p):
+                if len(ctr) == 0:
+                    ix.append(l)
+                px = s[l]
+                l = l + 1
+                if pxcnt := ctr.get(px):
+                    if pxcnt == 1:
+                        del ctr[px]  # eq 0
+                    else:
+                        ctr[px] = pxcnt - 1
+                else:
+                    ctr[px] = -1
+        return ix
+
+    def subarraySum(self, nums: List[int], k: int) -> int:
+        sum_count = {0: 1}
+        run_sum = 0
+        total = 0
+        for num in nums:
+            run_sum = run_sum + num
+            extra = run_sum - k
+            if cnt := sum_count.get(extra):
+                total = total + cnt
+            if cur_cnt := sum_count.get(run_sum):
+                sum_count[run_sum] = cur_cnt + 1
+            else:
+                sum_count[run_sum] = 1
+        return total
+
+    def minWindow(self, s: str, t: str) -> str:
+        target = {}
+        for cn in t:
+            if cn in target:
+                target[cn] += 1
+            else:
+                target[cn] = 1
+
+        l, r = 0, -1
+        actual = {}
+        minStr = None
+        while True:
+            met = all(cn in actual and actual[cn] >= cnt for cn, cnt in target.items())
+            if met:
+                if minStr is None or r - l + 1 < len(minStr):
+                    minStr = s[l : r + 1]
+                ln = s[l]
+                l = l + 1
+                actual[ln] -= 1
+            else:
+                if r + 1 >= len(s):
+                    break
+                rn = s[r + 1]
+                r = r + 1
+                if rn in actual:
+                    actual[rn] += 1
+                else:
+                    actual[rn] = 1
+        return minStr
+
+    def latestDayToCross(self, row: int, col: int, cells: List[List[int]]) -> int:
+        total_day = len(cells) + 1
+        final_map = [[total_day] * col for _ in range(row)]
+        for day, cell in enumerate(cells):
+            # before day + 1, cell is still unblocked...
+            final_map[cell[0] - 1][cell[1] - 1] = day + 1
+
+        def bfs(day: int) -> bool:
+            q = [(0, c) for c in range(col) if final_map[0][c] > day]
+            visited = set(q)
+            while len(q) > 0:
+                top = q.pop(0)
+                # print(f"day:{day}, visit:{top}")
+                if top[0] == row - 1:
+                    return True
+                else:
+                    for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                        nr, nc = dr + top[0], dc + top[1]
+                        if nr >= 0 and nc >= 0 and nr < row and nc < col:
+                            if final_map[nr][nc] > day:
+                                npos = (nr, nc)
+                                if npos not in visited:
+                                    visited.add(npos)
+                                    q.append(npos)
+            return False
+
+        # do binary day search
+        lower, upper = 0, total_day
+        result = 0
+        while lower <= upper:
+            mid = (lower + upper) // 2
+            if bfs(mid):
+                result = mid
+                lower = mid + 1
+            else:
+                upper = mid - 1
+        return result
+
+    def decodeString(self, s: str) -> str:
+        stk = ["1", "["]
+        cur = []
+        for ch in s + "]":
+            if ch == "[":
+                stk.append("".join(cur))
+                stk.append("[")
+                cur = []
+            elif ch == "]":
+                if len(cur) > 0:
+                    stk.append("".join(cur))
+                    cur = []
+                s = stk.pop()
+                while stk[-1] != "[":
+                    s = stk.pop() + s
+                assert stk.pop() == "["
+                n = stk.pop()
+                stk.append(int(n) * s)
+            else:
+                if len(cur) > 0 and not str(cur[-1]).isdigit() and ch.isdigit():
+                    stk.append("".join(cur))
+                    cur = []
+                cur.append(ch)
+        return stk[0]
+
+    def sumFourDivisors(self, nums: List[int]) -> int:
+        ret = 0
+        for num in nums:
+            fac_sum = 0
+            fac_cnt = 0
+            fac = 1
+            while fac * fac <= num:
+                if num % fac == 0:
+                    fac_cnt += 1
+                    fac_sum += fac
+                    if num // fac != fac:
+                        fac_cnt += 1
+                        fac_sum += num // fac
+                fac = fac + 1
+            if fac_cnt == 4:
+                ret += fac_sum
+        return ret
+
+    def repeatedNTimes(self, nums: List[int]) -> int:
+        for i in range(len(nums)):
+            for j in range(1, 4):
+                if i + j < len(nums) and nums[i + j] == nums[i]:
+                    return nums[i]
+
+        return -1
+
+    def generateParenthesis(self, n: int) -> List[str]:
+        ret = []
+        cur = []
+
+        def dfs(cur, ret, l, r) -> None:
+            if l == 0 and r == 0:
+                ret.append("".join(cur))
+            else:
+                if l > 0:
+                    cur.append("(")
+                    dfs(cur, ret, l - 1, r)
+                    cur.pop()
+                if r > 0 and r - 1 >= l:
+                    cur.append(")")
+                    dfs(cur, ret, l, r - 1)
+                    cur.pop()
+
+        dfs(cur, ret, n, n)
+        return ret
+
+    def longestDupSubstring(self, s: str) -> str:
+        def findDupSubstring(s: str, n: int) -> str | None:
+            subs = set()
+            # s=[abcde] 5, n=3, 0,1,2
+            for i in range(len(s) - n + 1):
+                ss = s[i : i + n]  # 0, 3
+                if ss in subs:
+                    return ss
+                else:
+                    subs.add(ss)
+            return None
+
+        l, r = 1, len(s)
+        mss = ""
+        while l <= r:
+            mid = (l + r) // 2
+            ss = findDupSubstring(s, mid)
+            if ss and len(ss) > len(mss):
+                mss = ss
+                l = mid + 1
+            else:
+                r = mid - 1
+        return mss
+
+    class TreeNode:
+        def __init__(self, val=0, left=None, right=None):
+            self.val = val
+            self.left = left
+            self.right = right
+
+    def maxProduct(self, root: Optional[TreeNode]) -> int:
+        nodeSums = set()
+
+        def getSubTreeSum(root: Optional[TreeNode], is_root: bool) -> int:
+            if root is None:
+                return 0
+            ret = (
+                getSubTreeSum(root.left, False)
+                + getSubTreeSum(root.right, False)
+                + root.val
+            )
+            if not is_root:
+                nodeSums.add(ret)
+            return ret
+
+        mx = 0
+        rootSum = getSubTreeSum(root, True)
+        for v in nodeSums:
+            if v * (rootSum - v) > mx:
+                mx = v * (rootSum - v)
+        return mx % 1000000007
+
 
 if __name__ == "__main__":
     s = Solution()
-    r = s.longestValidParentheses("()(()")
+    r = s.generateParenthesis(3)
     print(f"r ==> {r}")
