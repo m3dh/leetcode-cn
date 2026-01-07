@@ -594,6 +594,46 @@ class Solution:
                 mx = v * (rootSum - v)
         return mx % 1000000007
 
+    def findMinArrowShots(self, points: List[List[int]]) -> int:
+        cnt = len(points)
+        points.sort(key=lambda x: x[0])
+        for i in range(1, len(points)):
+            if points[i][0] <= points[i - 1][1]:
+                cnt = cnt - 1
+                points[i][1] = points[i - 1][1]
+        return cnt
+
+
+class FreqStack:
+    def __init__(self):
+        self._freqStacks = []
+        self._freqCount = {}
+        self._maxFreq = 0
+
+    def push(self, val: int) -> None:
+        freq = -1
+        if val in self._freqCount:
+            freq = self._freqCount[val] + 1
+            self._freqCount[val] = freq
+        else:
+            freq = 1
+            self._freqCount[val] = 1
+        self._maxFreq = max(self._maxFreq, freq)
+        while len(self._freqStacks) <= freq:
+            self._freqStacks.append([])
+        self._freqStacks[freq].append(val)
+
+    def pop(self) -> int:
+        if self._maxFreq <= 0:
+            return -1
+        else:
+            stack = self._freqStacks[self._maxFreq]
+            val = stack.pop()
+            self._freqCount[val] -= 1
+            while self._maxFreq > 0 and len(self._freqStacks[self._maxFreq]) == 0:
+                self._maxFreq -= 1
+            return val
+
 
 if __name__ == "__main__":
     s = Solution()
